@@ -1,39 +1,31 @@
 <?php
-include('dbconn.php');
-// SQL query to fetch data from Routes table
-if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    $sql = "SELECT *, ST_AsGeoJSON(end_location) as geojson_end_location FROM Routes";
+// Assuming you have a MySQL connection established
+require('dbconn.php');
 
-    // Execute query
-    $result = $conn->query($sql);
+// Check if 'endpoint' parameter is set in the URL
+if(isset($_GET['endpoint'])) {
+    // Get the selected endpoint value from the query string
+    $selectedEndpoint = $_GET['endpoint'];
 
-    $response = array(); // Initialize an array to hold responses
+    // Query the database to get the endpoint coordinates based on the selected endpoint value
+    $query = "SELECT ST_AsGeoJSON(end_location) as Coordinates FROM Routes WHERE route_id = $selectedEndpoint";
+    $result = mysqli_query($conn, $query);
 
-    if ($result->num_rows > 0) {
-        // Output data of each row
-        while($row = $result->fetch_assoc()) {
-            // Decode GeoJSON to get the coordinates
-            $geojson_end_location = json_decode($row['geojson_end_location'], true);
-            $coordinates = $geojson_end_location['coordinates'];
+    if ($result) { // Check if query executed successfully
+        if(mysqli_num_rows($result) > 0) { // Check if there are rows returned
+            $row = mysqli_fetch_assoc($result);
+            $coordinates = json_decode($row['Coordinates'], true);
 
-            // Building response for each row
-            $response[] = array(
-                'Id' => $row['driver_id'], 
-                'Coordinates' => $coordinates, 
-                'Constraints' => $row['constraints'], 
-                'Status' => $row['status']
-            );
+            // Return the endpoint coordinates as JSON
+            echo json_encode(array($coordinates));
+        } else {
+            echo "No data found for the provided endpoint"; // Handle case when no data found
         }
-        // Outputting the JSON encoded response
-        echo json_encode($response);
     } else {
-        echo "0 results";
+        // Handle the case when the query fails
+        echo "Error executing query: " . mysqli_error($conn);
     }
-
 } else {
-    die("Invalid HTTPS request");
+    echo "Please provide the 'endpoint' parameter in the URL"; // Handle case when 'endpoint' parameter is not provided
 }
-
-// Close connection
-$conn->close();
 ?>
