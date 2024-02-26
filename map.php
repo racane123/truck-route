@@ -16,7 +16,10 @@
     }
     #div{
         position: absolute;
+        top:10px;
     }
+
+
   </style>
 </head>
 <body>
@@ -26,8 +29,6 @@
 <div id="div">
   <select id="endpoint-select">
     <option value="">Select Endpoint</option>
-    <option value="1">Endpoint 1</option>
-    <option value="2">Endpoint 2</option>
   </select>
 </div>
 <script>
@@ -40,6 +41,7 @@ var map = new mapboxgl.Map({
   center: [121.04207, 14.75782], // Default center coordinates
   zoom: 12
 });
+
 
 navigator.geolocation.getCurrentPosition(successLocation, errorLocation, { enableHighAccuracy: true });
 
@@ -135,6 +137,23 @@ function errorLocation() {
   alert("Unable to retrieve your location.");
 }
 
+//dynamic selection option
+
+fetch('getting_routes.php')
+  .then(response => response.json())
+  .then(data => {
+    const routeSelect = document.getElementById('endpoint-select');
+
+    data.forEach(route => {
+      let option = document.createElement('option');
+      option.value = route.id; // Assuming 'id' is the property name for route_id
+      option.text = `${route.route_name} - ${route.name}`; // Assuming 'route_name' and 'name' are the property names for constraints and driver name respectively
+      routeSelect.appendChild(option);
+    });
+  })
+  .catch(error => {
+    console.error("Error fetching routes", error);
+  });
 
 </script>
 

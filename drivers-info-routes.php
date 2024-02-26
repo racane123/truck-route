@@ -26,6 +26,7 @@ if(isset($_GET['endpoint'])) {
         echo "Error executing query: " . mysqli_error($conn);
     }
 } else {
+    http_response_code(400); // Bad request
     echo "Please provide the 'endpoint' parameter in the URL"; // Handle case when 'endpoint' parameter is not provided
 }
 ?>

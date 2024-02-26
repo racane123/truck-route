@@ -12,11 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         while ($row = mysqli_fetch_assoc($result)) {
             $data[] = $row;
         }
-        echo json_encode(array('status' => 200, 'message' => 'Successfully fetch', 'data' => $data));
+        echo json_encode(array('status' => http_response_code(200), 'message' => 'Successfully fetch', 'data' => $data));
     } else {
-        echo json_encode(array('status' => 404, 'message' => 'No data found'));
+        echo json_encode(array('status' => http_response_code(404), 'message' => 'No data found'));
     }
 } else {
-    echo json_encode(array('status' => 400, 'message' => 'Bad request'));
+    echo json_encode(array('status' => http_response_code(400), 'message' => 'Bad request'));
+    
 }
+
+
 ?>

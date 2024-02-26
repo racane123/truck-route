@@ -13,7 +13,7 @@ if ($result->num_rows > 0){
         $data[] = $row ;
     }
 
-    $response = array('status' => 'success', 'data' => $data);
+    $response = array('status' => http_response_code(200), 'data' => $data);
     echo json_encode($response);
 }
 else {
